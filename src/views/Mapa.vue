@@ -53,7 +53,8 @@
                 <hr>
                 <div class="modalFooter">
                     <b-button variant="danger" @click="$bvModal.hide('modalAdicionarRemedio')">Cancelar</b-button>
-                    <b-button variant="success" type="submit">Adicionar</b-button>
+                    <b-button variant="success" v-if="selected.length" type="submit">Adicionar</b-button>
+                    <b-button variant="success" v-else disabled>Adicionar</b-button>
                 </div>
             </b-form>
         </div>

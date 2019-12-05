@@ -8,7 +8,7 @@ export default new Vuex.Store({
     postosDeSaude: [],
     remediosDeUmPosto: [],
     remedios: [],
-    usuario: null
+    usuario: JSON.parse(window.localStorage.getItem('leoa-usuario'))
   },
   getters: {
     getPostos: state => state.postosDeSaude,
