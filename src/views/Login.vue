@@ -49,14 +49,26 @@ export default {
         ...mapActions(['actionLogin']),
         submitLoginForm(ev) {
             const { form } = this
-
+            this.toast('Enviando solicitação')
+            
             this.actionLogin(form)
                 .then(() => {
                     this.$router.push({ name: 'mapa' })
                 })
                 .catch((e) => {
-                    alert('Usuário e/ou senha incorretos')
+                    this.toast('Usuário e/ou senha incorretos', 'danger')
                 })
+        },
+
+        toast(msg, variant = null) {
+            this.$bvToast.toast(msg, {
+                title: '',
+                autoHideDelay: 5000,
+                append: false,
+                solid: true,
+                variant
+
+            })
         }
     },
 

@@ -60,14 +60,24 @@ export default {
         
         submitCadastroForm(ev) {
             const { form } = this
+            this.toast('Enviando solicitação')
 
             this.actionCadastro(form)
                 .then(() => {
-                    alert('Usuário cadastrado com sucesso. Pode fazer login.')
+                    this.toast('Usuário cadastrado com sucesso. Pode fazer login.', 'success')
                 })
                 .catch(() => {
-                    alert('Erro ao cadastrar usuário')
+                    this.toast('Erro ao cadastrar usuário', 'danger')
                 })
+        },
+
+        toast(msg, variant = null) {
+            this.$bvToast.toast(msg, {
+                title: '',
+                autoHideDelay: 5000,
+                append: false,
+                variant
+            })
         }
     },
 

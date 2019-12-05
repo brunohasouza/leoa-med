@@ -159,7 +159,7 @@ export default new Vuex.Store({
         .get()
         .then(function(querySnapshot) {
             querySnapshot.forEach(function(doc) {
-                json.push(doc.data())
+              json[doc.data().objectId] = doc.data()
             });
             commit('SET_REMEDIOS', json)
         })

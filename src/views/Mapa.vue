@@ -42,7 +42,7 @@
             <hr>
             <b-form @submit.prevent="submitAdicionarRemedioForm">
                 <div class="modalRemedios">
-                    <b-form-checkbox-group id="checkbox-group-2" v-model="selected" name="remedios">
+                    <b-form-checkbox-group id="checkbox-group-2"  v-model="selected" name="remedios">
                         <b-form-checkbox 
                             v-for="remedio in returnRemedios" 
                             :key="remedio.objectId" 
@@ -66,7 +66,7 @@
 import GoogleMap from './../components/GoogleMap.vue'
 import InfoWindow from './../components/InfoWindow.vue'
 
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {
     components: {
@@ -82,10 +82,8 @@ export default {
                 const { filter } = this
 
                 return PRODUTO.toLowerCase().includes(filter.toLowerCase())
-
             })
         }
-
     },
 
     mounted() {
@@ -97,18 +95,31 @@ export default {
 
     methods: {
         ...mapActions(['actionListarTodosRemedios', 'actionAdicionarRemedio', 'actionLogout', 'actionListarPostos']),
+        ...mapMutations(['RESET_REMEDIOS_POSTO']),
         submitLogoutForm(ev) {
+            this.toast('Saindo...')
 
             this.actionLogout()
                 .then(() => {
                     this.$router.push({ name: 'login' })
                 })
                 .catch((e) => {
-                    alert('Usuário e/ou senha incorretos')
+                    this.toast('Usuário e/ou senha incorretos', 'danger')
                 })
+        },
+        toast(msg, variant = null) {
+            this.$bvToast.toast(msg, {
+                title: '',
+                autoHideDelay: 5000,
+                append: false,
+                solid: true,
+                variant
+
+            })
         },
         toggleInfoWindow(posto) {
             if (!posto) return
+            this.RESET_REMEDIOS_POSTO()
             this.selectedMarker = posto
             this.toggle = true
         },
@@ -116,14 +127,26 @@ export default {
             if (!this.selectedMarker || this.selected.length === 0) {
                 return
             }
+            this.toast('Solicitação em andamento')
 
             this.actionAdicionarRemedio({ 
                 postoId: this.selectedMarker.postoId, 
                 remedios: this.selected 
             })
             .then(() => {
-                alert('Remédios adicionados com sucesso')
+                this.closeModal()
+                this.toast('Remédios adicionados com sucesso', 'success')
             })
+            .catch(e => {
+                console.error(e)
+                this.toast('Erro ao adicionar remédios', 'danger')
+            })
+        },
+
+        closeModal() {
+            this.selected = []
+            this.filter = ''
+            this.$refs['adicionarRemedio'].hide()
         },
 
         showModal() {
@@ -137,7 +160,8 @@ export default {
             selectedMarker: null,
             filter: '',
             selected: [],
-            mapReady: false
+            mapReady: false,
+            reset: true
         }
     }
 }

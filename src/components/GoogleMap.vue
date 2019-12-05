@@ -32,8 +32,6 @@ export default {
             const element = document.getElementById(this.mapName)
             
             const options = {
-                zoom: 16,
-                center: new google.maps.LatLng(-8.0529087,-34.9556096),
                 streetViewControl: false,
                 mapTypeControl: false,
                 fullscreenControl: false
@@ -43,6 +41,8 @@ export default {
         },
 
         setupMarkers() {
+            const bounds = new google.maps.LatLngBounds()
+
             this.getPostos.forEach(posto => {
                 const position = new google.maps.LatLng(posto.lat, posto.lng)
 
@@ -54,6 +54,8 @@ export default {
                 google.maps.event.addListener(marker, 'click', (ev) => {
                     this.$emit('onMarkerClick', posto)
                 })
+
+                this.map.fitBounds(bounds.extend(position))
             })
         }
     },
