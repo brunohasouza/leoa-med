@@ -15,7 +15,7 @@ const routes = [
     name: 'login',
     component: Login,
     beforeEnter: (to, from, next) => {
-      if (!store.getters['isLogged']) {
+      if (!store.getters['getUsuario']) {
           next()
       } else {
           next({ name: 'mapa' })
@@ -27,7 +27,7 @@ const routes = [
     name: 'cadastro',
     component: Cadastro,
     beforeEnter: (to, from, next) => {
-      if (!store.getters['isLogged']) {
+      if (!store.getters['getUsuario']) {
           next()
       } else {
           next({ name: 'mapa' })
@@ -39,7 +39,7 @@ const routes = [
     name: 'mapa',
     component: Mapa,
     beforeEnter: (to, from, next) => {
-      if (store.getters['isLogged']) {
+      if (store.getters['getUsuario']) {
           next()
       } else {
           next({ name: 'login' })

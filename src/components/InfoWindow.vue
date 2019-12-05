@@ -2,8 +2,8 @@
 <div class="infoWindow__cotainer">
     <div class="infoWindow__cotainer--inner">
             <div class="infoWindow__cotainer--fixed">
-                <b-card-title>Nome do Posto de Saúde</b-card-title>
-                <b-card-sub-title>Av. Prof. Luís Freire, 500 - Cidade Universitária</b-card-sub-title>
+                <b-card-title>{{postoNome}}</b-card-title>
+                <b-card-sub-title>{{postoEndereco}}</b-card-sub-title>
                 <br>
                 <div class="infoWindow__cotainer--button">
                     <b-button 

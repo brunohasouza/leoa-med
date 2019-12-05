@@ -8,8 +8,8 @@
             </div>
         </b-navbar-brand>
         <b-navbar-nav class="ml-auto">
-            <span class="helloUser">Olá, Bruno</span>
-            <b-nav-item @click="actionLogout">Sair</b-nav-item>
+            <span class="helloUser">Olá, {{this.getUsuario}}</span>
+            <b-nav-item @click="submitLogoutForm">Sair</b-nav-item>
         </b-navbar-nav>
     </b-navbar>
     <div id="mapaContainer">
@@ -28,7 +28,7 @@
             v-if="toggle" 
             :posto-nome="selectedMarker.nome"
             :posto-endereco="selectedMarker.endereco"
-            :posto-id="selectedMarker.objectId" />
+            :posto-id="selectedMarker.postoId" />
     </transition>
 
     <b-modal ref="adicionarRemedio" id="modalAdicionarRemedio" hide-footer>
@@ -45,8 +45,8 @@
                     <b-form-checkbox-group id="checkbox-group-2" v-model="selected" name="remedios">
                         <b-form-checkbox 
                             v-for="remedio in returnRemedios" 
-                            :key="remedio.REGISTRO" 
-                            :value="remedio.REGISTRO"
+                            :key="remedio.objectId" 
+                            :value="remedio.objectId"
                         >{{ remedio.PRODUTO.toLowerCase() }}</b-form-checkbox>
                     </b-form-checkbox-group>
                 </div>
@@ -75,7 +75,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['getRemedios']),
+        ...mapGetters(['getRemedios', 'getUsuario']),
         returnRemedios: function() {
             return this.getRemedios.filter(remedio => {
                 const { PRODUTO } = remedio
@@ -94,21 +94,31 @@ export default {
             .then(() => this.mapReady = true)
     },
 
+
     methods: {
         ...mapActions(['actionListarTodosRemedios', 'actionAdicionarRemedio', 'actionLogout', 'actionListarPostos']),
+        submitLogoutForm(ev) {
 
+            this.actionLogout()
+                .then(() => {
+                    this.$router.push({ name: 'login' })
+                })
+                .catch((e) => {
+                    alert('Usuário e/ou senha incorretos')
+                })
+        },
         toggleInfoWindow(posto) {
             if (!posto) return
+            this.selectedMarker = posto
             this.toggle = true
         },
-
         submitAdicionarRemedioForm() {
             if (!this.selectedMarker || this.selected.length === 0) {
                 return
             }
 
-            this.submitAdicionarRemedioForm({ 
-                postoId: this.selectedMarker.objectId, 
+            this.actionAdicionarRemedio({ 
+                postoId: this.selectedMarker.postoId, 
                 remedios: this.selected 
             })
             .then(() => {

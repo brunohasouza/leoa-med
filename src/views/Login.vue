@@ -50,7 +50,7 @@ export default {
         submitLoginForm(ev) {
             const { form } = this
 
-            this.mapActions(form)
+            this.actionLogin(form)
                 .then(() => {
                     this.$router.push({ name: 'mapa' })
                 })
