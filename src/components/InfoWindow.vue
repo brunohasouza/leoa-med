@@ -2,9 +2,13 @@
 <div class="infoWindow__cotainer">
     <div class="infoWindow__cotainer--inner">
             <div class="infoWindow__cotainer--fixed">
-                <b-card-title>{{postoNome}}</b-card-title>
-                <b-card-sub-title>{{postoEndereco}}</b-card-sub-title>
-                <br>
+                <div class="infoWindow__cotainer--header">
+                    <div class="infoWindow-img">
+                        <img src="./../assets/pokecenter-lg.png" alt="">
+                    </div>
+                    <b-card-title>{{postoNome}}</b-card-title>
+                    <b-card-sub-title>{{postoEndereco}}</b-card-sub-title>
+                </div>
                 <div class="infoWindow__cotainer--button">
                     <b-button 
                         :class="'btnAdicionar'" 
@@ -208,6 +212,27 @@ export default {
             position: absolute;
             right: 1rem;
             bottom: 1rem;
+        }
+    }
+
+    &--header {
+        padding-bottom: 1.5rem;
+        .infoWindow-img {
+            float: left;
+            height: 3.5rem;
+            img {
+                height: 100%;
+                width: auto;
+            }
+        }
+
+        .card-title, .card-subtitle {
+            margin: 0;
+            margin-left: 4rem;
+        }
+
+        .card-title {
+            margin-bottom: .5rem;
         }
     }
 }

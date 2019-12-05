@@ -49,7 +49,7 @@ export default {
                 const marker = new google.maps.Marker({
                     position,
                     map: this.map,
-                    icon: 'http://localhost:8080/icon.png'
+                    icon: 'http://localhost:8080/pokecenter.png'
                 })
 
                 google.maps.event.addListener(marker, 'click', (ev) => {
