@@ -9,7 +9,7 @@
                     <b-card-title>{{postoNome}}</b-card-title>
                     <b-card-sub-title>{{postoEndereco}}</b-card-sub-title>
                 </div>
-                <div class="infoWindow__cotainer--button">
+                <div class="infoWindow__cotainer--button" v-if="getUsuario === 'Admin'">
                     <b-button 
                         :class="'btnAdicionar'" 
                         block 
@@ -35,6 +35,7 @@
                         variant="outline-danger" 
                         :class="'removerRemedio'" 
                         size="sm" 
+                        v-if="getUsuario ===  'Admin'"
                         @click="actionRemoverRemedioPosto({
                             postoId, 
                             remedioId: remedio.objectId
@@ -76,7 +77,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['getRemediosPosto', 'getLoading']),
+        ...mapGetters(['getRemediosPosto', 'getLoading', 'getUsuario']),
         returnRemedios: function() {
             return this.getRemediosPosto.filter(remedio => {
                 const { LABORATORIO, PRODUTO, REGISTRO, SUBSTANCIA } = remedio
