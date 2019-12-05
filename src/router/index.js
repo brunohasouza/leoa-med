@@ -1,23 +1,51 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+
+import Login from './../views/Login.vue'
+import Cadastro from './../views/Cadastro.vue'
+import Mapa from './../views/Mapa.vue'
+
+import store from './../store'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: Home
+    name: 'login',
+    component: Login,
+    beforeEnter: (to, from, next) => {
+      if (!store.getters['isLogged']) {
+          next()
+      } else {
+          next({ name: 'mapa' })
+      }
+    }
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
+    path: '/cadastro',
+    name: 'cadastro',
+    component: Cadastro,
+    beforeEnter: (to, from, next) => {
+      if (!store.getters['isLogged']) {
+          next()
+      } else {
+          next({ name: 'mapa' })
+      }
+    }
+  },
+  {
+    path: '/mapa',
+    name: 'mapa',
+    component: Mapa,
+    beforeEnter: (to, from, next) => {
+      if (store.getters['isLogged']) {
+          next()
+      } else {
+          next({ name: 'login' })
+      }
+    }
+  },
 ]
 
 const router = new VueRouter({
