@@ -9,14 +9,16 @@ export default new Vuex.Store({
     postosDeSaude: [],
     remediosDeUmPosto: [],
     remedios: [],
-    usuario: window.localStorage.getItem('leoa-usuario')
+    usuario: window.localStorage.getItem('leoa-usuario'),
+    loading: 0
   },
   getters: {
     getPostos: state => state.postosDeSaude,
     getRemediosPosto: state => state.remediosDeUmPosto,
     getRemedios: state => state.remedios,
     getUsuario: state => state.usuario,
-    logado: state => !!state.usuario
+    logado: state => !!state.usuario,
+    getLoading: state => state.loading
   },
   mutations: {
     SET_POSTOS: (state, postos) => {
@@ -33,7 +35,10 @@ export default new Vuex.Store({
     },
     SET_USUARIO: (state, usuario) => {
       state.usuario = usuario
-    }
+    },
+    LOADING_REMEDIOS: state => state.loading = 0,
+    ERROR_REMEDIOS: state => state.loading = -1,
+    SUCCESS_REMEDIOS: state => state.loading = 1
   },
   actions: {
      // action que retorna todos os postos de saúde de recife
@@ -56,6 +61,8 @@ export default new Vuex.Store({
     // action que recebe o id do posto e lista os seus remédios
     actionListarRemediosPosto: ({ commit }, payload) => {
       let json = []
+      commit('LOADING_REMEDIOS')
+
       db.collection("postos")
         .doc(payload.postoId)
         .collection('remedios')
@@ -65,6 +72,11 @@ export default new Vuex.Store({
               json.push(doc.data())
             });
             commit('SET_REMEDIOS_POSTO', json)
+            commit('SUCCESS_REMEDIOS')
+        })
+        .catch(e => {
+          console.error(e)
+          commit('ERROR_REMEDIOS')
         })
       
 

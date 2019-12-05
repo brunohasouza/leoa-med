@@ -19,7 +19,7 @@
                     <b-form-input v-model="filter" />
                 </b-input-group>
             </div>
-            <div class="infoWindow__cotainer--remedios">
+            <div class="infoWindow__cotainer--remedios" v-if="getLoading === 1 && returnRemedios.length > 0">
                 <div class="infoWindow__cotainer--remedio" v-for="remedio in returnRemedios" :key="remedio.REGISTRO">
                     <b-card-title :class="'capitalize'">{{ remedio.PRODUTO.toLowerCase() }}</b-card-title>
                     <b-card-sub-title :class="'capitalize'"><strong>Laboratório: </strong>{{ remedio.LABORATORIO.toLowerCase() }}</b-card-sub-title>
@@ -38,6 +38,15 @@
                     >Remover</b-button>
                     <hr>
                 </div>
+            </div>
+            <div class="infoWindow__cotainer--loading" v-else-if="getLoading === 1 && returnRemedios.length === 0">
+                <b-card-sub-title>Nenhum remédio registrado</b-card-sub-title>
+            </div>
+            <div class="infoWindow__cotainer--loading loading" v-else-if="getLoading === 0">
+                <b-card-sub-title>Carregando lista de remédios</b-card-sub-title>
+            </div>
+            <div class="infoWindow__cotainer--loading error" v-else>
+                <b-card-sub-title>Ocorreu um erro ao listar os remédios</b-card-sub-title>
             </div>
     </div>
 </div>
@@ -63,7 +72,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['getRemediosPosto']),
+        ...mapGetters(['getRemediosPosto', 'getLoading']),
         returnRemedios: function() {
             return this.getRemediosPosto.filter(remedio => {
                 const { LABORATORIO, PRODUTO, REGISTRO, SUBSTANCIA } = remedio
@@ -103,6 +112,27 @@ export default {
     box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 
         0px 8px 10px 1px rgba(0, 0, 0, 0.14), 
         0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+
+    &--loading {
+        padding: 1.5rem 0;
+
+        .card-subtitle {
+            width: 100%;
+            text-align: center;
+        }
+
+        &.loading {
+            .card-subtitle {
+                color:darkcyan !important;
+            }
+        }
+
+        &.error {
+            .card-subtitle {
+                color: crimson !important;
+            }
+        }
+    }
 
     &--inner {
         position: relative;
