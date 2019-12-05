@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { db } from '../main'
 
 Vue.use(Vuex)
 
@@ -8,13 +9,13 @@ export default new Vuex.Store({
     postosDeSaude: [],
     remediosDeUmPosto: [],
     remedios: [],
-    usuario: JSON.parse(window.localStorage.getItem('leoa-usuario'))
+    usuario: window.localStorage.getItem('leoa-usuario')
   },
   getters: {
     getPostos: state => state.postosDeSaude,
     getRemediosPosto: state => state.remediosDeUmPosto,
     getRemedios: state => state.remedios,
-    getUsuario: state => state.usuerio,
+    getUsuario: state => state.usuario,
     logado: state => !!state.usuario
   },
   mutations: {
@@ -35,22 +36,49 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    // action que retorna todos os postos de saúde de recife
+     // action que retorna todos os postos de saúde de recife
     actionListarPostos: ({ commit }) => {
       return new Promise((resolve, reject) => {
-        commit('SET_POSTOS', [])
-        resolve()
+        let json = [];
+        //Monta o json
+        db.collection("postos")
+        .get()
+        .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                json.push(doc.data())
+            });
+            commit('SET_POSTOS', json)
+            resolve()
+        })
       })
     },
 
     // action que recebe o id do posto e lista os seus remédios
     actionListarRemediosPosto: ({ commit }, payload) => {
-      commit('SET_REMEDIOS_POSTO', [])
+      let json = []
+      db.collection("postos")
+        .doc(payload.postoId)
+        .collection('remedios')
+        .get()
+        .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+              json.push(doc.data())
+            });
+            commit('SET_REMEDIOS_POSTO', json)
+        })
+      
+
+      
     },
 
     // action que recebe o id do posto e id do remédio e os remove do banco
     // chama actionListarRemediosPosto para atualizar a lista de remédios no front
     actionRemoverRemedioPosto: ({ dispatch }, payload) => {
+      db.collection("postos")
+      .doc(payload.postoId)
+      .collection('remedios')
+      .doc(String(payload.remedioId))
+      .delete()
       dispatch('actionListarRemediosPosto', { postoId: payload.postoId })
     },
     
@@ -58,14 +86,34 @@ export default new Vuex.Store({
     // retorna usuário e armazena ele no localStorage
     actionLogin: ({ commit }, payload) => {
       return new Promise((resolve, reject) => {
-        commit('SET_USUARIO', null)
-        resolve()
+        db.collection("usuarios").where("email", "==", payload.email).where("senha", "==", payload.password)
+        .get()
+        .then(function(querySnapshot) {
+            if(querySnapshot.empty == true){
+              reject()
+            } else {
+              commit('SET_USUARIO', querySnapshot.docs[0].data().nome)
+              window.localStorage.setItem('leoa-usuario', querySnapshot.docs[0].data().nome)
+              resolve()
+            }
+        })
+        
       })
     },
 
     // action que recebe email, nome e senha do usuário e adiciona-o ao banco
     actionCadastro: ({ commit }, payload) => {
       return new Promise((resolve, reject) => {
+        const ref = db.collection('usuarios').doc();
+        const id = ref.id;
+        db.collection("usuarios")
+        .doc(id)
+        .set({
+            usuarioId: id,
+            email: payload.email,
+            nome : payload.nome,
+            senha: payload.senha,
+        })
         resolve()
       })
     },
@@ -74,6 +122,7 @@ export default new Vuex.Store({
     actionLogout: ({ commit }) => {
       return new Promise((resolve, reject) => {
         commit('SET_USUARIO', null)
+        window.localStorage.removeItem('leoa-usuario')
         resolve()
       })
     },
@@ -81,8 +130,23 @@ export default new Vuex.Store({
     // action que recebe o id de um posto e um array de remedios, 
     // adiciona a lista de remédios ao posto e
     // chama actionListarRemediosPosto para atualizar a lista de remédios no front
-    actionAdicionarRemedio: ({ dispatch }, payload) => {
+    actionAdicionarRemedio: ({ dispatch , getters }, payload) => {
       return new Promise((resolve, reject) => {
+        payload.remedios.forEach(function(doc) {
+            let remedio = getters.getRemedios[doc]
+            db.collection("postos")
+            .doc(payload.postoId)
+            .collection('remedios')
+            .doc(String(doc))
+            .set({
+                REGISTRO: remedio.REGISTRO,
+                PRODUTO : remedio.PRODUTO,
+                SUBSTANCIA: remedio.SUBSTANCIA,
+                LABORATORIO: remedio.FABRICANTE,
+                TARJA: remedio.TARJA,
+                objectId: String(doc)
+            })
+        });        
         dispatch('actionListarRemediosPosto', { postoId: payload.postoId })
         resolve()
       })
@@ -90,7 +154,16 @@ export default new Vuex.Store({
 
     // action que lista todos os remédios registrados no sistema
     actionListarTodosRemedios: ({ commit }) => {
-      commit('SET_REMEDIOS', [])
+      let json = []
+      db.collection("remedios")
+        .get()
+        .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                json.push(doc.data())
+            });
+            commit('SET_REMEDIOS', json)
+        })
+      
     }
   },
 })
